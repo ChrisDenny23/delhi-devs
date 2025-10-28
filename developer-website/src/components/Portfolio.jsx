@@ -1,8 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import 'boxicons/css/boxicons.min.css';
 
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [visibleElements, setVisibleElements] = useState(new Set());
+  const observerRef = useRef(null);
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleElements((prev) => new Set([...prev, entry.target.dataset.animateId]));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    const elements = document.querySelectorAll('[data-animate-id]');
+    elements.forEach((el) => observerRef.current.observe(el));
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [activeFilter]);
 
   const projects = [
     {
@@ -78,11 +102,18 @@ const Portfolio = () => {
     { id: 'uiux', label: 'UI/UX', icon: 'bx-palette' }
   ];
 
+  const isVisible = (id) => visibleElements.has(id);
+
   return (
     <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 lg:px-20 min-h-screen overflow-hidden">
       <div className="relative z-10 w-full max-w-7xl mx-auto">
         {/* Section Tag */}
-        <div className='relative w-48 sm:w-52 h-10 bg-gradient-to-r from-[#656565] to-[#e99b63] rounded-full mx-auto mb-8 sm:mb-10 md:mb-12 transform hover:scale-105 transition-transform duration-150 ease-out'>
+        <div 
+          data-animate-id="section-tag"
+          className={`relative w-48 sm:w-52 h-10 bg-gradient-to-r from-[#656565] to-[#e99b63] rounded-full mx-auto mb-8 sm:mb-10 md:mb-12 transform hover:scale-105 transition-all duration-700 ${
+            isVisible('section-tag') ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'
+          }`}
+        >
           <div className='absolute inset-[3px] bg-black rounded-full flex items-center justify-center gap-1 text-sm sm:text-base'>
             <i className='bx bx-briefcase-alt-2'></i>
             PORTFOLIO
@@ -90,19 +121,34 @@ const Portfolio = () => {
         </div>
 
         {/* Main Heading */}
-        <h2 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-wider text-center mb-4 sm:mb-6 px-2'>
+        <h2 
+          data-animate-id="main-heading"
+          className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-wider text-center mb-4 sm:mb-6 px-2 transition-all duration-700 delay-100 ${
+            isVisible('main-heading') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           Our Work Speaks
           <br />
           for Itself
         </h2>
 
         {/* Description */}
-        <p className='text-sm sm:text-base md:text-lg tracking-wider text-gray-400 text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-2'>
+        <p 
+          data-animate-id="description"
+          className={`text-sm sm:text-base md:text-lg tracking-wider text-gray-400 text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-2 transition-all duration-700 delay-200 ${
+            isVisible('description') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           A glimpse into the projects we've crafted — clean code, modern design, and smooth performance.
         </p>
 
         {/* Filter Tabs */}
-        <div className='flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 sm:mb-12 md:mb-16'>
+        <div 
+          data-animate-id="filter-tabs"
+          className={`flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 sm:mb-12 md:mb-16 transition-all duration-700 delay-300 ${
+            isVisible('filter-tabs') ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+          }`}
+        >
           {filters.map((filter) => (
             <button
               key={filter.id}
@@ -124,8 +170,11 @@ const Portfolio = () => {
           {filteredProjects.map((project, index) => (
             <div
               key={project.id}
-              className='group relative border border-[#2a2a2a] rounded-2xl overflow-hidden bg-black bg-opacity-40 transform hover:-translate-y-2 hover:border-[#e99b63] transition-all duration-150 ease-out cursor-pointer'
-              style={{ animationDelay: `${index * 100}ms` }}
+              data-animate-id={`project-${activeFilter}-${project.id}`}
+              className={`group relative border border-[#2a2a2a] rounded-2xl overflow-hidden bg-black bg-opacity-40 transform hover:-translate-y-2 hover:border-[#e99b63] transition-all duration-700 cursor-pointer ${
+                isVisible(`project-${activeFilter}-${project.id}`) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{ transitionDelay: `${400 + index * 100}ms` }}
             >
               {/* Project Image */}
               <div className='relative h-48 sm:h-56 overflow-hidden'>
@@ -169,7 +218,13 @@ const Portfolio = () => {
           ))}
 
           {/* Your Project Card */}
-          <div className='group relative border border-[#2a2a2a] rounded-2xl overflow-hidden bg-black bg-opacity-40 transform hover:-translate-y-2 hover:border-[#e99b63] transition-all duration-150 ease-out cursor-pointer flex items-center justify-center min-h-[400px]'>
+          <div 
+            data-animate-id={`project-${activeFilter}-next`}
+            className={`group relative border border-[#2a2a2a] rounded-2xl overflow-hidden bg-black bg-opacity-40 transform hover:-translate-y-2 hover:border-[#e99b63] transition-all duration-700 cursor-pointer flex items-center justify-center min-h-[400px] ${
+              isVisible(`project-${activeFilter}-next`) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
+            style={{ transitionDelay: `${400 + filteredProjects.length * 100}ms` }}
+          >
             <div className='text-center p-6'>
               <div className='w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-r from-[#656565] to-[#e99b63] flex items-center justify-center mx-auto mb-6 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-150 ease-out'>
                 <i className='bx bx-plus text-5xl sm:text-6xl'></i>
@@ -186,7 +241,13 @@ const Portfolio = () => {
         </div>
 
         {/* Call to Action */}
-        <div className='text-center mb-8 sm:mb-12'>
+        <div 
+          data-animate-id="cta-section"
+          className={`text-center mb-8 sm:mb-12 transition-all duration-700 ${
+            isVisible('cta-section') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+          style={{ transitionDelay: `${400 + (filteredProjects.length + 1) * 100}ms` }}
+        >
           <p className='text-base sm:text-lg md:text-xl tracking-wider text-gray-300 max-w-3xl mx-auto mb-6 sm:mb-8'>
             We've helped ideas turn into products — ready for yours?
           </p>

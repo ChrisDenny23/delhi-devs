@@ -1,8 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import 'boxicons/css/boxicons.min.css';
 
 const Pricing = () => {
   const [activeTab, setActiveTab] = useState('websites');
+  const [visibleElements, setVisibleElements] = useState(new Set());
+  const observerRef = useRef(null);
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleElements((prev) => new Set([...prev, entry.target.dataset.animateId]));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    const elements = document.querySelectorAll('[data-animate-id]');
+    elements.forEach((el) => observerRef.current.observe(el));
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [activeTab]);
 
   const websitePricing = [
     {
@@ -111,11 +135,18 @@ const Pricing = () => {
 
   const currentPricing = activeTab === 'websites' ? websitePricing : appPricing;
 
+  const isVisible = (id) => visibleElements.has(id);
+
   return (
     <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 lg:px-20 min-h-screen flex items-center overflow-hidden">
       <div className="relative z-10 w-full max-w-7xl mx-auto">
         {/* Section Tag */}
-        <div className='relative w-48 sm:w-52 h-10 bg-gradient-to-r from-[#656565] to-[#e99b63] rounded-full mx-auto mb-8 sm:mb-10 md:mb-12 transform hover:scale-105 transition-transform duration-150 ease-out'>
+        <div 
+          data-animate-id="section-tag"
+          className={`relative w-48 sm:w-52 h-10 bg-gradient-to-r from-[#656565] to-[#e99b63] rounded-full mx-auto mb-8 sm:mb-10 md:mb-12 transform hover:scale-105 transition-all duration-700 ${
+            isVisible('section-tag') ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'
+          }`}
+        >
           <div className='absolute inset-[3px] bg-black rounded-full flex items-center justify-center gap-1 text-sm sm:text-base'>
             <i className='bx bx-dollar-circle'></i>
             PRICING
@@ -123,19 +154,34 @@ const Pricing = () => {
         </div>
 
         {/* Main Heading */}
-        <h2 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-wider text-center mb-4 sm:mb-6 px-2'>
+        <h2 
+          data-animate-id="main-heading"
+          className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-wider text-center mb-4 sm:mb-6 px-2 transition-all duration-700 delay-100 ${
+            isVisible('main-heading') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           Affordable Plans for
           <br />
           Websites & Apps That Work
         </h2>
 
         {/* Description */}
-        <p className='text-sm sm:text-base md:text-lg tracking-wider text-gray-400 text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-2'>
+        <p 
+          data-animate-id="description"
+          className={`text-sm sm:text-base md:text-lg tracking-wider text-gray-400 text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-2 transition-all duration-700 delay-200 ${
+            isVisible('description') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           Choose your platform and let's build something your users will love.
         </p>
 
         {/* Tab Toggle */}
-        <div className='flex justify-center mb-8 sm:mb-12 md:mb-16'>
+        <div 
+          data-animate-id="tab-toggle"
+          className={`flex justify-center mb-8 sm:mb-12 md:mb-16 transition-all duration-700 delay-300 ${
+            isVisible('tab-toggle') ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+          }`}
+        >
           <div className='inline-flex border border-[#2a2a2a] rounded-full p-1 bg-black bg-opacity-40'>
             <button
               onClick={() => setActiveTab('websites')}
@@ -167,11 +213,15 @@ const Pricing = () => {
           {currentPricing.map((plan, index) => (
             <div
               key={index}
-              className={`relative border rounded-2xl p-6 sm:p-8 bg-black bg-opacity-40 transform hover:-translate-y-2 transition-all duration-150 ease-out cursor-pointer group ${
+              data-animate-id={`plan-${activeTab}-${index}`}
+              className={`relative border rounded-2xl p-6 sm:p-8 bg-black bg-opacity-40 transform hover:-translate-y-2 transition-all duration-700 cursor-pointer group ${
                 plan.popular 
                   ? 'border-[#e99b63]' 
                   : 'border-[#2a2a2a] hover:border-[#e99b63]'
+              } ${
+                isVisible(`plan-${activeTab}-${index}`) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
               }`}
+              style={{ transitionDelay: `${400 + index * 100}ms` }}
             >
               {/* Popular Badge */}
               {plan.popular && (
@@ -216,7 +266,12 @@ const Pricing = () => {
         </div>
 
         {/* Custom Projects Section */}
-        <div className='border border-[#2a2a2a] rounded-2xl p-6 sm:p-8 md:p-10 bg-black bg-opacity-40 text-center transform hover:border-[#e99b63] transition-all duration-150 ease-out'>
+        <div 
+          data-animate-id="custom-projects"
+          className={`border border-[#2a2a2a] rounded-2xl p-6 sm:p-8 md:p-10 bg-black bg-opacity-40 text-center transform hover:border-[#e99b63] transition-all duration-700 delay-700 ${
+            isVisible('custom-projects') ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
+          }`}
+        >
           <div className='w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r from-[#656565] to-[#e99b63] flex items-center justify-center mx-auto mb-4 sm:mb-6'>
             <i className='bx bx-customize text-4xl sm:text-5xl'></i>
           </div>

@@ -1,11 +1,43 @@
+import { useEffect, useRef, useState } from 'react';
 import 'boxicons/css/boxicons.min.css';
 
 const About = () => {
+  const [visibleElements, setVisibleElements] = useState(new Set());
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleElements((prev) => new Set([...prev, entry.target.dataset.animateId]));
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      }
+    );
+
+    const elements = sectionRef.current?.querySelectorAll('[data-animate-id]');
+    elements?.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  const isVisible = (id) => visibleElements.has(id);
+
   return (
-    <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 lg:px-20 min-h-screen flex items-center overflow-hidden">
+    <section ref={sectionRef} className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 lg:px-20 min-h-screen flex items-center overflow-hidden">
       <div className="relative z-10 w-full max-w-7xl mx-auto">
         {/* Section Tag */}
-        <div className='relative w-48 sm:w-48 h-10 bg-gradient-to-r from-[#656565] to-[#e99b63] rounded-full mx-auto mb-8 sm:mb-10 md:mb-12 transform hover:scale-105 transition-transform duration-150 ease-out'>
+        <div 
+          data-animate-id="tag"
+          className={`relative w-48 sm:w-48 h-10 bg-gradient-to-r from-[#656565] to-[#e99b63] rounded-full mx-auto mb-8 sm:mb-10 md:mb-12 transform hover:scale-105 transition-all duration-700 ease-out ${
+            isVisible('tag') ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'
+          }`}
+        >
           <div className='absolute inset-[3px] bg-black rounded-full flex items-center justify-center gap-1 text-sm sm:text-base'>
             <i className='bx bx-info-circle'></i>
             ABOUT US
@@ -13,21 +45,37 @@ const About = () => {
         </div>
 
         {/* Main Heading */}
-        <h2 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-wider text-center mb-4 sm:mb-6 px-2'>
+        <h2 
+          data-animate-id="heading"
+          className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-wider text-center mb-4 sm:mb-6 px-2 transition-all duration-700 ease-out delay-100 ${
+            isVisible('heading') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           Crafting Digital
           <br />
           Excellence Since Day One
         </h2>
 
         {/* Description */}
-        <p className='text-sm sm:text-base md:text-lg tracking-wider text-gray-400 text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-2'>
+        <p 
+          data-animate-id="description"
+          className={`text-sm sm:text-base md:text-lg tracking-wider text-gray-400 text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-2 transition-all duration-700 ease-out delay-200 ${
+            isVisible('description') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           We're digital architects transforming ideas into powerful experiences with technical expertise and creative innovation.
         </p>
 
         {/* Stats Grid */}
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16'>
           {/* Stat Card 1 */}
-          <div className='border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 md:p-8 bg-black bg-opacity-40 transform hover:-translate-y-1 hover:border-[#e99b63] transition-all duration-150 ease-out cursor-pointer group'>
+          <div 
+            data-animate-id="stat1"
+            className={`border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 md:p-8 bg-black bg-opacity-40 transform hover:-translate-y-1 hover:border-[#e99b63] transition-all duration-700 ease-out cursor-pointer group ${
+              isVisible('stat1') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
+            style={{ transitionDelay: isVisible('stat1') ? '300ms' : '0ms' }}
+          >
             <div className='text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#656565] to-[#e99b63] bg-clip-text text-transparent mb-2 sm:mb-3 md:mb-4 transform group-hover:scale-110 transition-transform duration-150 ease-out'>
               50+
             </div>
@@ -36,7 +84,13 @@ const About = () => {
           </div>
 
           {/* Stat Card 2 */}
-          <div className='border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 md:p-8 bg-black bg-opacity-40 transform hover:-translate-y-1 hover:border-[#e99b63] transition-all duration-150 ease-out cursor-pointer group'>
+          <div 
+            data-animate-id="stat2"
+            className={`border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 md:p-8 bg-black bg-opacity-40 transform hover:-translate-y-1 hover:border-[#e99b63] transition-all duration-700 ease-out cursor-pointer group ${
+              isVisible('stat2') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
+            style={{ transitionDelay: isVisible('stat2') ? '400ms' : '0ms' }}
+          >
             <div className='text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#656565] to-[#e99b63] bg-clip-text text-transparent mb-2 sm:mb-3 md:mb-4 transform group-hover:scale-110 transition-transform duration-150 ease-out'>
               100%
             </div>
@@ -45,7 +99,13 @@ const About = () => {
           </div>
 
           {/* Stat Card 3 */}
-          <div className='border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 md:p-8 bg-black bg-opacity-40 sm:col-span-2 md:col-span-1 transform hover:-translate-y-1 hover:border-[#e99b63] transition-all duration-150 ease-out cursor-pointer group'>
+          <div 
+            data-animate-id="stat3"
+            className={`border border-[#2a2a2a] rounded-2xl p-5 sm:p-6 md:p-8 bg-black bg-opacity-40 sm:col-span-2 md:col-span-1 transform hover:-translate-y-1 hover:border-[#e99b63] transition-all duration-700 ease-out cursor-pointer group ${
+              isVisible('stat3') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
+            style={{ transitionDelay: isVisible('stat3') ? '500ms' : '0ms' }}
+          >
             <div className='text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#656565] to-[#e99b63] bg-clip-text text-transparent mb-2 sm:mb-3 md:mb-4 transform group-hover:scale-110 transition-transform duration-150 ease-out'>
               24/7
             </div>
@@ -59,7 +119,13 @@ const About = () => {
           {/* Left Side - Features */}
           <div className='space-y-4 sm:space-y-6 md:space-y-8'>
             {/* Feature 1 */}
-            <div className='flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl transform hover:bg-[#1a1a1a] hover:translate-x-2 transition-all duration-150 ease-out cursor-pointer group'>
+            <div 
+              data-animate-id="feature1"
+              className={`flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl transform hover:bg-[#1a1a1a] hover:translate-x-2 transition-all duration-700 ease-out cursor-pointer group ${
+                isVisible('feature1') ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
+              }`}
+              style={{ transitionDelay: isVisible('feature1') ? '600ms' : '0ms' }}
+            >
               <div className='w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-[#656565] to-[#e99b63] flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-150 ease-out'>
                 <i className='bx bx-code-alt text-xl sm:text-2xl'></i>
               </div>
@@ -71,7 +137,13 @@ const About = () => {
             </div>
 
             {/* Feature 2 */}
-            <div className='flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl transform hover:bg-[#1a1a1a] hover:translate-x-2 transition-all duration-150 ease-out cursor-pointer group'>
+            <div 
+              data-animate-id="feature2"
+              className={`flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl transform hover:bg-[#1a1a1a] hover:translate-x-2 transition-all duration-700 ease-out cursor-pointer group ${
+                isVisible('feature2') ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
+              }`}
+              style={{ transitionDelay: isVisible('feature2') ? '700ms' : '0ms' }}
+            >
               <div className='w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-[#656565] to-[#e99b63] flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-150 ease-out'>
                 <i className='bx bx-palette text-xl sm:text-2xl'></i>
               </div>
@@ -83,7 +155,13 @@ const About = () => {
             </div>
 
             {/* Feature 3 */}
-            <div className='flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl transform hover:bg-[#1a1a1a] hover:translate-x-2 transition-all duration-150 ease-out cursor-pointer group'>
+            <div 
+              data-animate-id="feature3"
+              className={`flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl transform hover:bg-[#1a1a1a] hover:translate-x-2 transition-all duration-700 ease-out cursor-pointer group ${
+                isVisible('feature3') ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
+              }`}
+              style={{ transitionDelay: isVisible('feature3') ? '800ms' : '0ms' }}
+            >
               <div className='w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-[#656565] to-[#e99b63] flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-150 ease-out'>
                 <i className='bx bx-rocket text-xl sm:text-2xl'></i>
               </div>
@@ -96,7 +174,13 @@ const About = () => {
           </div>
 
           {/* Right Side - Mission Statement */}
-          <div className='hidden lg:block border border-[#2a2a2a] rounded-2xl p-6 sm:p-8 lg:p-12 bg-black bg-opacity-50 transform hover:border-[#e99b63] transition-all duration-150 ease-out'>
+          <div 
+            data-animate-id="mission"
+            className={`hidden lg:block border border-[#2a2a2a] rounded-2xl p-6 sm:p-8 lg:p-12 bg-black bg-opacity-50 transform hover:border-[#e99b63] transition-all duration-700 ease-out ${
+              isVisible('mission') ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
+            }`}
+            style={{ transitionDelay: isVisible('mission') ? '900ms' : '0ms' }}
+          >
             <h3 className='text-2xl sm:text-3xl font-semibold tracking-wider mb-4 sm:mb-6'>Our Mission</h3>
             <p className='text-gray-400 tracking-wider text-base sm:text-lg leading-relaxed mb-4 sm:mb-6'>
               To empower businesses and entrepreneurs with innovative digital solutions that drive growth and create lasting impact in the digital landscape.
